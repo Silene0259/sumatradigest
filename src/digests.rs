@@ -15,7 +15,7 @@ pub fn cli() -> Command {
         .subcommand(
             Command::new("sha1")
             .about("Hashes file and returns hash digest given the SHA1 Hash Function")
-            .arg(arg!(path: [PATH]).last(true))
+            .arg(arg!(path: [PATH]))
             .arg_required_else_help(true),
         )
         .subcommand(
