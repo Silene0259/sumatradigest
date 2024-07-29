@@ -52,7 +52,7 @@ pub fn app() {
             let digest = sub_matches
                 .get_one::<String>("digest")
                 .map(|s| s.as_str())
-                .expect("defaulted in clap");
+                .unwrap_or("32");
             
             let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
             let path_unwrapped = path.expect("Failed To Get Path For SHA1");
