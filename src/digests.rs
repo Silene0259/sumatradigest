@@ -30,7 +30,18 @@ pub fn cli() -> Command {
             )
             .arg(arg!(path: [PATH]))
             .arg_required_else_help(true),
-        )      
+        )
+        .subcommand(
+            Command::new("sha3")
+            .about("Hashes files using the SHA3 function and returns given digest. The given sizes are SHA3-223, SHA3-256, SHA3-384, SHA3-512")
+            .arg(
+                arg!(--n <DIGEST>)
+                .value_parser(["28","32","48","64","224","256","384","512"])
+                .num_args(0..=1)
+                .require_equals(true)
+                .default_missing_value("256")
+            )
+        )
 }
 
 
@@ -55,7 +66,7 @@ pub fn app() {
                 .unwrap_or("32");
             
             let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
-            let path_unwrapped = path.expect("Failed To Get Path For SHA1");
+            let path_unwrapped = path.expect("Failed To Get Path For SHA2");
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
@@ -80,6 +91,71 @@ pub fn app() {
             }
 
         }
+        Some(("sha3", sub_matches)) => {
+            let digest = sub_matches
+                .get_one::<String>("digest")
+                .map(|s| s.as_str())
+                .unwrap_or("32");
+            
+            let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
+            let path_unwrapped = path.expect("Failed To Get Path For SHA3");
+            let current_path = Path::new(path_unwrapped);
+            let bytes = ReadFile::new(current_path);
+
+            if digest == "256" || digest == "32" {
+                let digest = SumatraSha3::sha3_256(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else if digest == "224" || digest == "28" {
+                let digest = SumatraSha3::sha3_224(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else if digest == "384" || digest == "48" {
+                let digest = SumatraSha3::sha3_384(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else if digest == "512" || digest == "64" {
+                let digest = SumatraSha3::sha3_512(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else {
+                println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
+            }
+
+        }
+        Some(("blake2b", sub_matches)) => {
+            let digest = sub_matches
+                .get_one::<String>("digest")
+                .map(|s| s.as_str())
+                .unwrap_or("32");
+            
+            let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
+            let path_unwrapped = path.expect("Failed To Get Path For SHA1");
+            let current_path = Path::new(path_unwrapped);
+            let bytes = ReadFile::new(current_path);
+
+            if digest == "256" || digest == "32" {
+                let digest = SumatraSha3::sha3_256(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else if digest == "224" || digest == "28" {
+                let digest = SumatraSha3::sha3_224(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else if digest == "384" || digest == "48" {
+                let digest = SumatraSha3::sha3_384(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else if digest == "512" || digest == "64" {
+                let digest = SumatraSha3::sha3_512(bytes);
+                println!("{}",digest.to_string().as_str())
+            }
+            else {
+                println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
+            }
+
+        }
+
         _ => {
             println!("Print Welcome")
         }
