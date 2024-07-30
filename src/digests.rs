@@ -42,6 +42,24 @@ pub fn cli() -> Command {
                 .default_missing_value("256")
             )
         )
+        .subcommand(
+            Command::new("blake3")
+            .about("Hashes files using the BLAKE3 hash function and returns given digest.")
+            .arg(arg!(path: [PATH]))
+            .arg_required_else_help(true),
+        )
+        .subcommand(
+            Command::new("blake2b")
+            .about("Hashes files using the blake2b function and returns given digest. The given sizes are SHA3-223, SHA3-256, SHA3-384, SHA3-512")
+            .arg(
+                arg!(--n <DIGEST>)
+                .value_parser(["4","6","8","12","16","20","24","28","32","36","40","44","48","52","56","60","64","96","128","160","192","224","256","288","320","352","384","416","448","480","512"])
+                .num_args(0..=1)
+                .require_equals(true)
+                .default_missing_value("256")
+            )
+        )
+
 }
 
 
@@ -134,26 +152,91 @@ pub fn app() {
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
+            let key = vec![];
+
             if digest == "256" || digest == "32" {
-                let digest = SumatraSha3::sha3_256(bytes);
+                let digest = SumatraBlake2b::new(bytes, key, 32usize);
                 println!("{}",digest.to_string().as_str())
             }
             else if digest == "224" || digest == "28" {
-                let digest = SumatraSha3::sha3_224(bytes);
+                let digest = SumatraBlake2b::new(bytes, key, 28usize);
                 println!("{}",digest.to_string().as_str())
             }
             else if digest == "384" || digest == "48" {
-                let digest = SumatraSha3::sha3_384(bytes);
+                let digest = SumatraBlake2b::new(bytes, key, 48usize);
                 println!("{}",digest.to_string().as_str())
             }
             else if digest == "512" || digest == "64" {
-                let digest = SumatraSha3::sha3_512(bytes);
+                let digest = SumatraBlake2b::new(bytes, key, 32usize);
+
                 println!("{}",digest.to_string().as_str())
+            }
+            else if digest == "4" {
+                let digest = SumatraBlake2b::new(bytes, key, 4usize);
+
+            }
+            else if digest == "6" {
+                let digest = SumatraBlake2b::new(bytes, key, 6usize);
+
+            }
+            else if digest == "8" {
+                let digest = SumatraBlake2b::new(bytes, key, 8usize);
+
+            }
+            else if digest == "12" || digest == "96" {
+                let digest = SumatraBlake2b::new(bytes, key, 12usize);
+
+            }
+            else if digest == "16" || digest == "128" {
+                let digest = SumatraBlake2b::new(bytes, key, 16usize);
+
+            }
+            else if digest == "20" || digest == "160" {
+                let digest = SumatraBlake2b::new(bytes, key, 20usize);
+
+            }
+            else if digest == "24" || digest == "192" {
+                let digest = SumatraBlake2b::new(bytes, key, 24usize);
+
+            }
+            else if digest == "36" || digest == "288" {
+                let digest = SumatraBlake2b::new(bytes, key, 36usize);
+
+            }
+            else if digest == "40" || digest == "320" {
+                let digest = SumatraBlake2b::new(bytes, key, 40usize);
+
+            }
+            else if digest == "44" || digest == "352" {
+                let digest = SumatraBlake2b::new(bytes, key, 44usize);
+
+            }
+            else if digest == "52" || digest == "416" {
+                let digest = SumatraBlake2b::new(bytes, key, 52usize);
+
+            }
+            else if digest == "56" || digest == "448" {
+                let digest = SumatraBlake2b::new(bytes, key, 56usize);
+
+            }
+            else if digest == "60" || digest == "480" {
+                let digest = SumatraBlake2b::new(bytes, key, 60usize);
+
             }
             else {
                 println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
             }
 
+        }
+        Some(("blake3", sub_matches)) => {
+            let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
+            let path_unwrapped = path.expect("Failed To Get Path For SHA1");
+            let current_path = Path::new(path_unwrapped);
+            let bytes = ReadFile::new(current_path);
+
+            let digest = SumatraBlake3::new(bytes);
+
+            println!("{}",digest.to_string().as_str())
         }
 
         _ => {
