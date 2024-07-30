@@ -26,7 +26,8 @@ pub fn cli() -> Command {
                     .value_parser(["28","32","48","64", "224", "256", "384","512"])
                     .num_args(0..=1)
                     .require_equals(true)
-                    .default_missing_value("256"),
+                    .default_missing_value("256")
+                    .short('d')
             )
             .arg(arg!(path: [PATH]))
             .arg_required_else_help(true),
@@ -35,12 +36,14 @@ pub fn cli() -> Command {
             Command::new("sha3")
             .about("Hashes files using the SHA3 function and returns given digest. The given sizes are SHA3-223, SHA3-256, SHA3-384, SHA3-512")
             .arg(
-                arg!(--n <DIGEST>)
+                arg!(--digest <DIGEST>)
                 .value_parser(["28","32","48","64","224","256","384","512"])
                 .num_args(0..=1)
                 .require_equals(true)
-                .default_missing_value("256")
+                .default_missing_value("32")
+                .short('d')
             )
+            .arg(arg!(path: [PATH]))
         )
         .subcommand(
             Command::new("blake3")
@@ -52,12 +55,16 @@ pub fn cli() -> Command {
             Command::new("blake2b")
             .about("Hashes files using the blake2b function and returns given digest. The given sizes are SHA3-223, SHA3-256, SHA3-384, SHA3-512")
             .arg(
-                arg!(--n <DIGEST>)
+                arg!(--digest <DIGEST>)
                 .value_parser(["4","6","8","12","16","20","24","28","32","36","40","44","48","52","56","60","64","96","128","160","192","224","256","288","320","352","384","416","448","480","512"])
                 .num_args(0..=1)
                 .require_equals(true)
                 .default_missing_value("256")
+                .short('d')
+                
             )
+            .arg(arg!(path: [PATH]))
+            .arg_required_else_help(true),
         )
 
 }
@@ -173,55 +180,55 @@ pub fn app() {
             }
             else if digest == "4" {
                 let digest = SumatraBlake2b::new(bytes, key, 4usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "6" {
                 let digest = SumatraBlake2b::new(bytes, key, 6usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "8" {
                 let digest = SumatraBlake2b::new(bytes, key, 8usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "12" || digest == "96" {
                 let digest = SumatraBlake2b::new(bytes, key, 12usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "16" || digest == "128" {
                 let digest = SumatraBlake2b::new(bytes, key, 16usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "20" || digest == "160" {
                 let digest = SumatraBlake2b::new(bytes, key, 20usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "24" || digest == "192" {
                 let digest = SumatraBlake2b::new(bytes, key, 24usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "36" || digest == "288" {
                 let digest = SumatraBlake2b::new(bytes, key, 36usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "40" || digest == "320" {
                 let digest = SumatraBlake2b::new(bytes, key, 40usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "44" || digest == "352" {
                 let digest = SumatraBlake2b::new(bytes, key, 44usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "52" || digest == "416" {
                 let digest = SumatraBlake2b::new(bytes, key, 52usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "56" || digest == "448" {
                 let digest = SumatraBlake2b::new(bytes, key, 56usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else if digest == "60" || digest == "480" {
                 let digest = SumatraBlake2b::new(bytes, key, 60usize);
-
+                println!("{}",digest.to_string().as_str())
             }
             else {
                 println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
