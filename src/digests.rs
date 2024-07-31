@@ -66,6 +66,13 @@ pub fn cli() -> Command {
             .arg(arg!(path: [PATH]))
             .arg_required_else_help(true),
         )
+        .subcommand(
+            Command::new("shake256")
+            .about("Hashes file using the SHAKE256 hash function and returns given digest. The size is 512-bits")
+            .arg(arg!(path: [PATH]))
+            .arg_required_else_help(true),
+
+        )
 
 }
 
@@ -245,7 +252,16 @@ pub fn app() {
 
             println!("{}",digest.to_string().as_str())
         }
+        Some(("shake256", sub_matches)) => {
+            let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
+            let path_unwrapped = path.expect("Failed To Get Path For SHA1");
+            let current_path = Path::new(path_unwrapped);
+            let bytes = ReadFile::new(current_path);
 
+            let digest = SumatraShake256::new(bytes);
+
+            println!("{}",digest.to_string().as_str())
+        }
         _ => {
             println!("Print Welcome")
         }
