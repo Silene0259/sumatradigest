@@ -1,5 +1,5 @@
 use libsumatracrypt_rs::digest::*;
-use clap::{Arg,Command,Parser,arg};
+use clap::{Arg,Command,Parser,arg,ArgAction};
 
 use crate::read::ReadFile;
 
@@ -16,6 +16,11 @@ pub fn cli() -> Command {
             Command::new("sha1")
             .about("Hashes file and returns hash digest given the SHA1 Hash Function")
             .arg(arg!(path: [PATH]))
+            .arg(
+                arg!(-ck --checksum <CHECKSUM>)
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
             .arg_required_else_help(true),
         )
         .subcommand(
@@ -87,9 +92,20 @@ pub fn app() {
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
-            let digest = SumatraSha1::new(bytes);
+            let digest = SumatraSha1::new(&bytes);
 
-            println!("{}",digest.to_string().as_str())
+            let mut ck = false;
+
+            ck = sub_matches
+            .get_flag("checksum");
+
+            if ck == true {
+                let checksum = checksum(&bytes);
+                println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str());
+            }
+            else {
+                println!("{}",digest.to_string().as_str());
+            }
         }
         Some(("sha2", sub_matches)) => {
             let digest = sub_matches
@@ -266,4 +282,9 @@ pub fn app() {
             println!("Print Welcome")
         }
     }
+}
+
+pub fn checksum(bytes: &[u8]) -> SumatraDigest {
+    let key = vec![];
+    return SumatraBlake2b::new(bytes, &key, 8usize)
 }
