@@ -56,6 +56,13 @@ pub fn cli() -> Command {
                 .short('d')
             )
             .arg(arg!(path: [PATH]))
+            .arg_required_else_help(true)
+            .arg(
+                arg!(-c --checksum <CHECKSUM>)
+                .short('c')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
         )
         .subcommand(
             Command::new("blake3")
@@ -154,16 +161,34 @@ pub fn app() {
                 }
             }
             else if digest == "224" || digest == "28" {
-                let digest = SumatraSha2::sha224(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha2::sha224(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "384" || digest == "48" {
-                let digest = SumatraSha2::sha384(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha2::sha384(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "512" || digest == "64" {
-                let digest = SumatraSha2::sha512(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha2::sha512(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else {
                 println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
@@ -181,21 +206,52 @@ pub fn app() {
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
+
+            //====CHECKSUM====
+            let mut ck = false;
+
+            ck = sub_matches
+            .get_flag("checksum");
+
             if digest == "256" || digest == "32" {
-                let digest = SumatraSha3::sha3_256(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha3::sha3_256(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "224" || digest == "28" {
-                let digest = SumatraSha3::sha3_224(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha3::sha3_224(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "384" || digest == "48" {
-                let digest = SumatraSha3::sha3_384(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha3::sha3_384(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "512" || digest == "64" {
-                let digest = SumatraSha3::sha3_512(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha3::sha3_512(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else {
                 println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
@@ -209,7 +265,7 @@ pub fn app() {
                 .unwrap_or("32");
             
             let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
-            let path_unwrapped = path.expect("Failed To Get Path For SHA1");
+            let path_unwrapped = path.expect("Failed To Get Path For BLAKE2B");
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
