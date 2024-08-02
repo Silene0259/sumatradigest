@@ -17,7 +17,8 @@ pub fn cli() -> Command {
             .about("Hashes file and returns hash digest given the SHA1 Hash Function")
             .arg(arg!(path: [PATH]))
             .arg(
-                arg!(-ck --checksum <CHECKSUM>)
+                arg!(-c --checksum <CHECKSUM>)
+                .short('c')
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
@@ -31,11 +32,17 @@ pub fn cli() -> Command {
                     .value_parser(["28","32","48","64", "224", "256", "384","512"])
                     .num_args(0..=1)
                     .require_equals(true)
-                    .default_missing_value("256")
+                    .default_missing_value("32")
                     .short('d')
             )
             .arg(arg!(path: [PATH]))
-            .arg_required_else_help(true),
+            .arg_required_else_help(true)
+            .arg(
+                arg!(-c --checksum <CHECKSUM>)
+                .short('c')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
         )
         .subcommand(
             Command::new("sha3")
@@ -54,6 +61,12 @@ pub fn cli() -> Command {
             Command::new("blake3")
             .about("Hashes files using the BLAKE3 hash function and returns given digest.")
             .arg(arg!(path: [PATH]))
+            .arg(
+                arg!(-c --checksum <CHECKSUM>)
+                .short('c')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
             .arg_required_else_help(true),
         )
         .subcommand(
@@ -75,6 +88,12 @@ pub fn cli() -> Command {
             Command::new("shake256")
             .about("Hashes file using the SHAKE256 hash function and returns given digest. The size is 512-bits")
             .arg(arg!(path: [PATH]))
+            .arg(
+                arg!(-c --checksum <CHECKSUM>)
+                .short('c')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
             .arg_required_else_help(true),
 
         )
@@ -118,9 +137,21 @@ pub fn app() {
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
+            // ====CHECKSUM====
+            let mut ck = false;
+
+            ck = sub_matches
+            .get_flag("checksum");
+
             if digest == "256" || digest == "32" {
-                let digest = SumatraSha2::sha256(bytes);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraSha2::sha256(&bytes);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "224" || digest == "28" {
                 let digest = SumatraSha2::sha224(bytes);
@@ -264,9 +295,22 @@ pub fn app() {
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
-            let digest = SumatraBlake3::new(bytes);
+            // ===Checksum===
+            let mut ck = false;
 
-            println!("{}",digest.to_string().as_str())
+            ck = sub_matches
+            .get_flag("checksum");
+
+            let digest = SumatraBlake3::new(&bytes);
+
+            if ck == true {
+                let checksum = checksum(&bytes);
+                println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+            }
+            else {
+                println!("{}",digest.to_string().as_str())
+            }
+
         }
         Some(("shake256", sub_matches)) => {
             let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
@@ -274,9 +318,21 @@ pub fn app() {
             let current_path = Path::new(path_unwrapped);
             let bytes = ReadFile::new(current_path);
 
-            let digest = SumatraShake256::new(bytes);
+            let digest = SumatraShake256::new(&bytes);
 
-            println!("{}",digest.to_string().as_str())
+            let mut ck = false;
+
+            ck = sub_matches
+            .get_flag("checksum");
+
+            if ck == true {
+                let checksum = checksum(&bytes);
+                println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str());
+            }
+            else {
+                println!("{}",digest.to_string().as_str())
+            }
+
         }
         _ => {
             println!("Print Welcome")
