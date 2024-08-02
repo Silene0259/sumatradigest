@@ -68,13 +68,14 @@ pub fn cli() -> Command {
             Command::new("blake3")
             .about("Hashes files using the BLAKE3 hash function and returns given digest.")
             .arg(arg!(path: [PATH]))
+            .arg_required_else_help(true)
             .arg(
                 arg!(-c --checksum <CHECKSUM>)
                 .short('c')
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
-            .arg_required_else_help(true),
+            
         )
         .subcommand(
             Command::new("blake2b")
@@ -89,7 +90,13 @@ pub fn cli() -> Command {
                 
             )
             .arg(arg!(path: [PATH]))
-            .arg_required_else_help(true),
+            .arg_required_else_help(true)
+            .arg(
+                arg!(-c --checksum <CHECKSUM>)
+                .short('c')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
         )
         .subcommand(
             Command::new("shake256")
@@ -271,74 +278,182 @@ pub fn app() {
 
             let key = vec![];
 
+            //====CHECKSUM====
+            let mut ck = false;
+
+            ck = sub_matches
+            .get_flag("checksum");
+
             if digest == "256" || digest == "32" {
-                let digest = SumatraBlake2b::new(bytes, key, 32usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 32usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "224" || digest == "28" {
-                let digest = SumatraBlake2b::new(bytes, key, 28usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 28usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "384" || digest == "48" {
-                let digest = SumatraBlake2b::new(bytes, key, 48usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 48usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "512" || digest == "64" {
-                let digest = SumatraBlake2b::new(bytes, key, 32usize);
+                let digest = SumatraBlake2b::new(&bytes, &key, 32usize);
 
-                println!("{}",digest.to_string().as_str())
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "4" {
-                let digest = SumatraBlake2b::new(bytes, key, 4usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 4usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "6" {
-                let digest = SumatraBlake2b::new(bytes, key, 6usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 6usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "8" {
-                let digest = SumatraBlake2b::new(bytes, key, 8usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 8usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "12" || digest == "96" {
-                let digest = SumatraBlake2b::new(bytes, key, 12usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 12usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "16" || digest == "128" {
-                let digest = SumatraBlake2b::new(bytes, key, 16usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 16usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "20" || digest == "160" {
-                let digest = SumatraBlake2b::new(bytes, key, 20usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 20usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "24" || digest == "192" {
-                let digest = SumatraBlake2b::new(bytes, key, 24usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 24usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "36" || digest == "288" {
-                let digest = SumatraBlake2b::new(bytes, key, 36usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 36usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "40" || digest == "320" {
-                let digest = SumatraBlake2b::new(bytes, key, 40usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 40usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "44" || digest == "352" {
-                let digest = SumatraBlake2b::new(bytes, key, 44usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 44usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "52" || digest == "416" {
-                let digest = SumatraBlake2b::new(bytes, key, 52usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 52usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "56" || digest == "448" {
-                let digest = SumatraBlake2b::new(bytes, key, 56usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 56usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else if digest == "60" || digest == "480" {
-                let digest = SumatraBlake2b::new(bytes, key, 60usize);
-                println!("{}",digest.to_string().as_str())
+                let digest = SumatraBlake2b::new(&bytes, &key, 60usize);
+                if ck == true {
+                    let checksum = checksum(&bytes);
+                    println!("{} ({})",digest.to_string().as_str(),checksum.to_string().as_str())
+                }
+                else {
+                    println!("{}",digest.to_string().as_str())
+                }
             }
             else {
                 println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
