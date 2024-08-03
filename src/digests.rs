@@ -6,6 +6,35 @@ use crate::read::ReadFile;
 
 use std::ffi::OsString;
 use std::path::{Path,PathBuf};
+use std::io::prelude::*;
+use std::fs::File;
+
+pub enum HASH_TYPES {
+    SHA1,
+    SHAKE256,
+    BLAKE3,
+
+    SHA256,
+    SHA384,
+    SHA512,
+    SHA224,
+    
+    SHA3_224,
+    SHA3_256,
+    SHA3_384,
+    SHA3_512,
+    
+    BLAKE2B224,
+    BLAKE2B256,
+    BLAKE2B384,
+    BLAKE2B512,
+    BLAKE2BVAR,
+
+    CHECKSUM,
+
+}
+
+
 
 pub fn cli() -> Command {
     Command::new("sumdigest")
@@ -16,13 +45,20 @@ pub fn cli() -> Command {
             Command::new("sha1")
             .about("Hashes file and returns hash digest given the SHA1 Hash Function")
             .arg(arg!(path: [PATH]))
+            .arg_required_else_help(true)
             .arg(
                 arg!(-c --checksum <CHECKSUM>)
                 .short('c')
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
-            .arg_required_else_help(true),
+            .arg(
+                arg!(-w --write <WRITE>)
+                .short('w')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
+            
         )
         .subcommand(
             Command::new("sha2")
@@ -120,6 +156,8 @@ pub fn app() {
 
     match sumdigestapp.subcommand() {
         Some(("sha1", sub_matches)) => {
+            pub const HASH_TYPE: &str = "SHA1";
+            
             let mut path = sub_matches.get_one::<String>("path").map(|s| s.as_str());
             let path_unwrapped = path.expect("Failed To Get Path For SHA1");
             let current_path = Path::new(path_unwrapped);
@@ -128,9 +166,12 @@ pub fn app() {
             let digest = SumatraSha1::new(&bytes);
 
             let mut ck = false;
+            let mut writ = false;
 
             ck = sub_matches
             .get_flag("checksum");
+
+            writ = sub_matches.get_flag("write");
 
             if ck == true {
                 let checksum = checksum(&bytes);
@@ -138,6 +179,11 @@ pub fn app() {
             }
             else {
                 println!("{}",digest.to_string().as_str());
+            }
+
+            if writ == true {
+                let checksum = checksum(&bytes);
+                digest_write_to_file(digest, checksum, HASH_TYPES::SHA1);
             }
         }
         Some(("sha2", sub_matches)) => {
@@ -158,6 +204,7 @@ pub fn app() {
             .get_flag("checksum");
 
             if digest == "256" || digest == "32" {
+                pub const HASH_TYPE: &str = "SHA256";
                 let digest = SumatraSha2::sha256(&bytes);
                 if ck == true {
                     let checksum = checksum(&bytes);
@@ -514,4 +561,56 @@ pub fn app() {
 pub fn checksum(bytes: &[u8]) -> SumatraDigest {
     let key = vec![];
     return SumatraBlake2b::new(bytes, &key, 8usize)
+}
+
+pub fn digest_write_to_file(digest: SumatraDigest, checksum: SumatraDigest, hash_type: HASH_TYPES) -> std::io::Result<()> {
+    let mut checksum_filename = checksum.to_string();
+    checksum_filename.push_str(".sum");
+
+    let final_digest = digest.to_string();
+
+
+    //let mut final_path = path;
+    //final_path.push(checksum_filename);
+
+    let hash = match hash_type {
+        HASH_TYPES::SHA1 => "SHA1: ",
+        HASH_TYPES::SHAKE256 => "SHAKE256: ",
+        HASH_TYPES::BLAKE3 => "BLAKE3: ",
+        
+        HASH_TYPES::CHECKSUM => "BLAKE2B CHECKSUM: ",
+
+        HASH_TYPES::SHA224 => "SHA224: ",
+        HASH_TYPES::SHA256 => "SHA256: ",
+        HASH_TYPES::SHA384 => "SHA384: ",
+        HASH_TYPES::SHA512 => "SHA512: ",
+        
+        HASH_TYPES::SHA3_224 => "SHA3-224: ",
+        HASH_TYPES::SHA3_256 => "SHA3-256: ",
+        HASH_TYPES::SHA3_384 => "SHA3-384: ",
+        HASH_TYPES::SHA3_512 => "SHA3-512: ",
+
+        HASH_TYPES::BLAKE2B224 => "BLAKE2B-224: ",
+        HASH_TYPES::BLAKE2B256 => "BLAKE2B-256: ",
+        HASH_TYPES::BLAKE2B384 => "BLAKE2B-384: ",
+        HASH_TYPES::BLAKE2B512 => "BLAKE2B-512: ",
+
+        HASH_TYPES::BLAKE2BVAR => "BLAKE2B-VARIABLE-DIGEST-LEN: ",
+    };
+
+    
+    let mut final_data_for_file = String::new();
+
+    final_data_for_file.push_str(hash);
+    final_data_for_file.push_str(final_digest.as_str());
+    
+    
+    final_data_for_file.push_str(" (");
+    final_data_for_file.push_str(&checksum.to_string());
+    final_data_for_file.push_str(")");
+
+    
+    let mut file = File::create(checksum_filename)?;
+    file.write_all(final_digest.as_bytes())?;
+    Ok(())
 }
