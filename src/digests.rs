@@ -79,6 +79,12 @@ pub fn cli() -> Command {
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
+            .arg(
+                arg!(-w --write <WRITE>)
+                .short('w')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
         )
         .subcommand(
             Command::new("sha3")
@@ -99,6 +105,12 @@ pub fn cli() -> Command {
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
+            .arg(
+                arg!(-w --write <WRITE>)
+                .short('w')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
         )
         .subcommand(
             Command::new("blake3")
@@ -108,6 +120,12 @@ pub fn cli() -> Command {
             .arg(
                 arg!(-c --checksum <CHECKSUM>)
                 .short('c')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
+            .arg(
+                arg!(-w --write <WRITE>)
+                .short('w')
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
@@ -133,18 +151,31 @@ pub fn cli() -> Command {
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
+            .arg(
+                arg!(-w --write <WRITE>)
+                .short('w')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
         )
         .subcommand(
             Command::new("shake256")
             .about("Hashes file using the SHAKE256 hash function and returns given digest. The size is 512-bits")
             .arg(arg!(path: [PATH]))
+            .arg_required_else_help(true)
             .arg(
                 arg!(-c --checksum <CHECKSUM>)
                 .short('c')
                 .num_args(0)
                 .action(ArgAction::SetTrue)
             )
-            .arg_required_else_help(true),
+            .arg(
+                arg!(-w --write <WRITE>)
+                .short('w')
+                .num_args(0)
+                .action(ArgAction::SetTrue)
+            )
+            
 
         )
 
@@ -166,11 +197,12 @@ pub fn app() {
             let digest = SumatraSha1::new(&bytes);
 
             let mut ck = false;
-            let mut writ = false;
 
             ck = sub_matches
             .get_flag("checksum");
 
+
+            let mut writ = false;
             writ = sub_matches.get_flag("write");
 
             if ck == true {
@@ -203,6 +235,9 @@ pub fn app() {
             ck = sub_matches
             .get_flag("checksum");
 
+            let mut writ = false;
+            writ = sub_matches.get_flag("write");
+
             if digest == "256" || digest == "32" {
                 pub const HASH_TYPE: &str = "SHA256";
                 let digest = SumatraSha2::sha256(&bytes);
@@ -212,6 +247,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA256);
                 }
             }
             else if digest == "224" || digest == "28" {
@@ -223,6 +262,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA224);
+                }
             }
             else if digest == "384" || digest == "48" {
                 let digest = SumatraSha2::sha384(&bytes);
@@ -233,6 +276,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA384);
+                }
             }
             else if digest == "512" || digest == "64" {
                 let digest = SumatraSha2::sha512(&bytes);
@@ -242,6 +289,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA512);
                 }
             }
             else {
@@ -267,6 +318,9 @@ pub fn app() {
             ck = sub_matches
             .get_flag("checksum");
 
+            let mut writ = false;
+            writ = sub_matches.get_flag("write");
+
             if digest == "256" || digest == "32" {
                 let digest = SumatraSha3::sha3_256(&bytes);
                 if ck == true {
@@ -275,6 +329,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA3_256);
                 }
             }
             else if digest == "224" || digest == "28" {
@@ -286,6 +344,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA3_224);
+                }
             }
             else if digest == "384" || digest == "48" {
                 let digest = SumatraSha3::sha3_384(&bytes);
@@ -295,6 +357,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA3_384);
                 }
             }
             else if digest == "512" || digest == "64" {
@@ -306,7 +372,12 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::SHA3_512);
+                }
             }
+            
             else {
                 println!("[Failure] Digest Length Not Supported or Something Unexpected Happened")
             }
@@ -331,6 +402,9 @@ pub fn app() {
             ck = sub_matches
             .get_flag("checksum");
 
+            let mut writ = false;
+            writ = sub_matches.get_flag("write");
+
             if digest == "256" || digest == "32" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 32usize);
                 if ck == true {
@@ -339,6 +413,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2B256);
                 }
             }
             else if digest == "224" || digest == "28" {
@@ -350,6 +428,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2B224);
+                }
             }
             else if digest == "384" || digest == "48" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 48usize);
@@ -359,6 +441,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2B384);
                 }
             }
             else if digest == "512" || digest == "64" {
@@ -371,6 +457,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2B512);
+                }
             }
             else if digest == "4" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 4usize);
@@ -380,6 +470,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
                 }
             }
             else if digest == "6" {
@@ -391,6 +485,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
+                }
             }
             else if digest == "8" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 8usize);
@@ -400,6 +498,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
                 }
             }
             else if digest == "12" || digest == "96" {
@@ -411,6 +513,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
+                }
             }
             else if digest == "16" || digest == "128" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 16usize);
@@ -420,6 +526,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
                 }
             }
             else if digest == "20" || digest == "160" {
@@ -431,6 +541,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
+                }
             }
             else if digest == "24" || digest == "192" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 24usize);
@@ -440,6 +554,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
                 }
             }
             else if digest == "36" || digest == "288" {
@@ -451,6 +569,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
+                }
             }
             else if digest == "40" || digest == "320" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 40usize);
@@ -460,6 +582,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
                 }
             }
             else if digest == "44" || digest == "352" {
@@ -471,6 +597,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
+                }
             }
             else if digest == "52" || digest == "416" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 52usize);
@@ -480,6 +610,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
                 }
             }
             else if digest == "56" || digest == "448" {
@@ -491,6 +625,10 @@ pub fn app() {
                 else {
                     println!("{}",digest.to_string().as_str())
                 }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
+                }
             }
             else if digest == "60" || digest == "480" {
                 let digest = SumatraBlake2b::new(&bytes, &key, 60usize);
@@ -500,6 +638,10 @@ pub fn app() {
                 }
                 else {
                     println!("{}",digest.to_string().as_str())
+                }
+                if writ == true {
+                    let checksum = checksum(&bytes);
+                    digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE2BVAR);
                 }
             }
             else {
@@ -516,8 +658,12 @@ pub fn app() {
             // ===Checksum===
             let mut ck = false;
 
+            let mut writ = false;
+
             ck = sub_matches
             .get_flag("checksum");
+
+            writ = sub_matches.get_flag("write");
 
             let digest = SumatraBlake3::new(&bytes);
 
@@ -527,6 +673,11 @@ pub fn app() {
             }
             else {
                 println!("{}",digest.to_string().as_str())
+            }
+
+            if writ == true {
+                let checksum = checksum(&bytes);
+                digest_write_to_file(digest, checksum, HASH_TYPES::BLAKE3);
             }
 
         }
@@ -540,8 +691,12 @@ pub fn app() {
 
             let mut ck = false;
 
+            let mut writ = false;
+
             ck = sub_matches
             .get_flag("checksum");
+
+            writ = sub_matches.get_flag("write");
 
             if ck == true {
                 let checksum = checksum(&bytes);
@@ -549,6 +704,10 @@ pub fn app() {
             }
             else {
                 println!("{}",digest.to_string().as_str())
+            }
+            if writ == true {
+                let checksum = checksum(&bytes);
+                digest_write_to_file(digest, checksum, HASH_TYPES::SHAKE256);
             }
 
         }
