@@ -1,6 +1,6 @@
 [package]
 name = "sumatradigest"
-version = "0.1.0"
+version = "0.2.0"
 author = "Silene"
 description = "A Memory-Safe Hash Digest Tool Written In Rust"
 license = "MIT"
@@ -9,5 +9,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libsumatracrypt-rs = "0.2.0"
+libsumatracrypt-rs = {version = "0.4.1", default-features=false, features = ["digests"]}
 clap = { version = "4.5.11", features = ["derive"] }
